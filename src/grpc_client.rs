@@ -1,6 +1,7 @@
+use tokio::stream;
+
 use services::{payment_service_client::PaymentServiceClient, PaymentRequest,
         transaction_service_client::TransactionServiceClient, TransactionRequest};
-use tokio::stream;
 
 pub mod services {
     tonic::include_proto!("services");

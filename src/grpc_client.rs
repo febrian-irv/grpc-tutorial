@@ -1,17 +1,16 @@
-use services::chat_service_client::ChatServiceClient;
-use tokio::stream;
-use tonic::transport::{channel, Channel};
+use tonic::transport::Channel;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tokio::sync::mpsc::{Sender, Receiver};
 use tokio::io::{self, AsyncBufReadExt};
 
-use services::{payment_service_client::PaymentServiceClient, PaymentRequest,
-        transaction_service_client::TransactionServiceClient, TransactionRequest};
-
 pub mod services {
     tonic::include_proto!("services");
 }
+
+use services::{payment_service_client::PaymentServiceClient, PaymentRequest,
+        transaction_service_client::TransactionServiceClient, TransactionRequest,
+        chat_service_client::ChatServiceClient, ChatMessage};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tokio::spawn(async move {
         let stdin = io::stdin();
-        let mut reader = io::BuffReader::new(stdin).lines();
+        let mut reader = io::BufReader::new(stdin).lines();
 
         while let Ok(Some(line)) = reader.next_line().await {
             if line.trim().is_empty() {

@@ -9,12 +9,12 @@ service PaymentService {
 
 // Service for checking transaction history
 service TransactionService {
-    rpc GetTransactionHistory(TransactionRequest) returns (TransactionResponse);
+    rpc GetTransactionHistory(TransactionRequest) returns (stream TransactionResponse);
 }
 
 // Service for chatitng with a customer service bot
 service ChatService {
-    rpc Chat(ChatMessage) returns (stream ChatMessage);
+    rpc Chat(stream ChatMessage) returns (stream ChatMessage);
 }
 
 message PaymentRequest {

@@ -3,13 +3,13 @@ use tokio::sync::mpsc;
 use tokio_stream::wrappers::ReceiverStream;
 use tokio::sync::mpsc::{Receiver, Sender};
 
-use services::{payment_service_server::{PaymentService, PaymentServiceServer}, PaymentRequest, PaymentResponse,
-        transaction_service_server::{TransactionService, TransactionServiceServer}, TransactionRequest, TransactionResponse,
-        chat_service_server::{ChatService, ChatServiceServer}, ChatMessage};
-
 pub mod services {
     tonic::include_proto!("services");
 }
+
+use services::{payment_service_server::{PaymentService, PaymentServiceServer}, PaymentRequest, PaymentResponse,
+        transaction_service_server::{TransactionService, TransactionServiceServer}, TransactionRequest, TransactionResponse,
+        chat_service_server::{ChatService, ChatServiceServer}, ChatMessage};
 
 #[derive(Default)]
 pub struct MyPaymentService {}
@@ -40,7 +40,7 @@ impl TransactionService for MyTransactionService {
         request: Request<TransactionRequest>
     ) -> Result<Response<Self::GetTransactionHistoryStream>, Status> {
         println!("Received transaction history request: {:?}", request);
-        let (tx, rx): (Sender<Result<TransactionResponse>, Status>, Receiver<Result<TransactionResponse,Status>>) = mpsc::channel(4);
+        let (tx, rx): (Sender<Result<TransactionResponse, Status>>, Receiver<Result<TransactionResponse,Status>>) = mpsc::channel(4);
 
         tokio::spawn(async move {
             for i in 0..30 { //Simulate sending 30 transaction records
@@ -80,8 +80,7 @@ impl ChatService for MyChatService {
                 print!("Received message: {:?}", message);
                 let reply = ChatMessage {
                     user_id: message.user_id.clone(),
-                    message: format!("Terima kasih telah melakukan chat kepada CS virtual,
-                        Pesan anda akan dibalas pada jam kerja. pesan anda : {}", message.message),
+                    message: format!("Terima kasih telah melakukan chat kepada CS virtual, Pesan anda akan dibalas pada jam kerja. pesan anda : {}", message.message),
                 };
 
                 tx.send(Ok(reply)).await.unwrap_or_else(|_| {});
